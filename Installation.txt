@@ -1,0 +1,65 @@
+master node kurulum
+
+yum install -y python3 python3-pip git
+curl –sfL https://get.rke2.io | INSTALL_RKE2_VERSION=v1.26.4+rke2r1 sh -
+git clone https://github.com/rancher/rke2.git
+cd rke2/contrib/custom-image-kubelet
+pip install -r requirements.txt
+python genconfig.py --release-url https://distro.eks.amazonaws.com/kubernetes-1-26/kubernetes-1-26-eks-9.yaml
+mv /var/lib/rancher/rke2 /data/
+sed -i 's|/var/lib/rancher|/data|g' /etc/rancher/rke2/config.yaml
+sed -i '/kube-apiserver-image/d' /etc/rancher/rke2/config.yaml 
+cat <<EOF >>/etc/rancher/rke2/config.yaml
+disable: rke2-ingress-nginx
+kube-apiserver-arg: "kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname"
+node-name: lapptest284
+node-taint:
+- CriticalAddonsOnly=true:NoExecute
+tls-san:
+- 10.184.100.112
+- 10.184.100.111
+- 10.184.100.110
+- 10.184.100.113
+- 10.184.100.114
+- 10.184.100.115
+- 10.184.100.116
+- cluster.local
+token: 9q0JpjxFzSBRKJjAaQtRVcJq0tgHXhzKtSXRjUYtg5t8yTQ77QbF9UJFGNDQBbx3
+server: https://10.184.100.112:9345 ### ILK MASTERDA OLMAYACAK
+EOF
+sed -i 's|SELINUX=enforcing|SELINUX=disabled|g' /etc/selinux/config 
+systemctl enable rke2-server
+reboot
+
+worker node kurulum
+yum install -y python3 python3-pip git
+export INSTALL_RKE2_TYPE="agent"
+curl –sfL https://get.rke2.io | INSTALL_RKE2_VERSION=v1.26.4+rke2r1 sh -
+git clone https://github.com/rancher/rke2.git
+cd rke2/contrib/custom-image-kubelet
+pip install -r requirements.txt
+python genconfig.py --release-url https://distro.eks.amazonaws.com/kubernetes-1-26/kubernetes-1-26-eks-9.yaml
+mv /var/lib/rancher/rke2 /data/
+sed -i 's|/var/lib/rancher|/data|g' /etc/rancher/rke2/config.yaml
+sed -i '/kube-apiserver-image/d' /etc/rancher/rke2/config.yaml 
+cat <<EOF >>/etc/rancher/rke2/config.yaml
+disable: rke2-ingress-nginx
+kube-apiserver-arg: "kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname"
+node-name: lapptest289
+tls-san:
+- 10.184.100.112
+- 10.184.100.111
+- 10.184.100.110
+- 10.184.100.113
+- 10.184.100.114
+- 10.184.100.115
+- 10.184.100.116
+- cluster.local
+token: 9q0JpjxFzSBRKJjAaQtRVcJq0tgHXhzKtSXRjUYtg5t8yTQ77QbF9UJFGNDQBbx3
+server: https://10.184.100.112:9345
+EOF
+sed -i 's|SELINUX=enforcing|SELINUX=disabled|g' /etc/selinux/config 
+systemctl enable rke2-agent
+reboot
+
+
