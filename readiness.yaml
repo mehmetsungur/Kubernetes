@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: readiness-exec
+  labels:
+    name: readiness-exec
+spec:
+  containers:
+  - name: readiness
+    image: busybox
+    command: ['sh','-c','echo Hi, Kube! && sleep 3600']
+    readinessProbe:
+      exec:
+        command: ['sh','-c','echo Hi, Kube!']    
+      initialDelaySeconds: 10
+      timeoutSeconds: 2
+      periodSeconds: 5
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    ports:
+      - containerPort: 80
