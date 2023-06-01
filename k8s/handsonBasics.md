@@ -192,7 +192,7 @@ kubectl describe replicaset <replicaset-name>
 - Create pods individually with or without labels and see their behaviors alongwith ReplicaSet
 
 ```bash
-kubectl run nginx2 --image=nginx --labels app=nginx
+
 ```
 
 ```bash
